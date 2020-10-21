@@ -10,6 +10,7 @@ import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -29,14 +30,14 @@ public class MainLayout extends VerticalLayout implements PageConfigurator
 		super();
 		this.initUI();
 	}
-	
+
 	@Override
 	public void configurePage(final InitialPageSettings settings)
 	{
 		settings.addLink("shortcut icon", "frontend/images/favicon.ico");
 		settings.addFavIcon("icon", "frontend/images/favicon256.png", "256x256");
 	}
-	
+
 	/**
 	 * Event handler delegate method for the {@link Button} {@link #button}.
 	 *
@@ -47,7 +48,7 @@ public class MainLayout extends VerticalLayout implements PageConfigurator
 	{
 		Navigation.navigateTo(SecondWindow.class);
 	}
-
+	
 	/**
 	 * Event handler delegate method for the {@link Button} {@link #btnStartRequest}.
 	 *
@@ -68,7 +69,7 @@ public class MainLayout extends VerticalLayout implements PageConfigurator
 			}
 		});
 	}
-	
+
 	/**
 	 * Event handler delegate method for the {@link Button} {@link #button2}.
 	 *
@@ -78,7 +79,7 @@ public class MainLayout extends VerticalLayout implements PageConfigurator
 	private void button2_onClick(final ClickEvent<Button> event)
 	{
 		final UI current = UI.getCurrent();
-		
+
 		Rap.getExecutorService().execute(() -> {
 			IntStream.range(1, 10).forEach(i -> {
 				current.access(() -> {
@@ -95,6 +96,39 @@ public class MainLayout extends VerticalLayout implements PageConfigurator
 				});
 			});
 		});
+		
+	}
+	
+	/**
+	 * Event handler delegate method for the {@link Button} {@link #button3}.
+	 *
+	 * @see ComponentEventListener#onComponentEvent(ComponentEvent)
+	 * @eventHandlerDelegate Do NOT delete, used by UI designer!
+	 */
+	private void button3_onClick(final ClickEvent<Button> event)
+	{
+		final UI ui = UI.getCurrent();
+
+		Rap.getExecutorService().execute(() -> {
+			ui.access(() -> {
+				IntStream.range(1, 10).forEach(i -> {
+					try
+					{
+						this.label.setText("Durchlauf Nr. " + i);
+						Thread.sleep(1000);
+						ui.push();
+					}
+					catch(final InterruptedException e)
+					{
+						e.printStackTrace();
+					}
+				});
+				this.anchor.setVisible(this.isVisible());
+				ui.push();
+			});
+			
+			this.anchor.setVisible(true);
+		});
 
 	}
 
@@ -105,33 +139,42 @@ public class MainLayout extends VerticalLayout implements PageConfigurator
 		this.horizontalLayout = new HorizontalLayout();
 		this.btnStartRequest  = new Button();
 		this.button2          = new Button();
+		this.button3          = new Button();
 		this.label            = new Label();
+		this.anchor           = new Anchor();
 		this.button           = new Button();
-
+		
 		this.btnStartRequest.setText("Start Block Request");
 		this.button2.setText("Start Thread Request");
+		this.button3.setText("Report erstellen");
 		this.label.setText("Label");
+		this.anchor.setText("Threadresult herunterladen");
+		this.anchor.setVisible(false);
 		this.button.setText("Zur nächsten Seite");
-
+		
 		this.btnStartRequest.setSizeUndefined();
 		this.button2.setSizeUndefined();
-		this.horizontalLayout.add(this.btnStartRequest, this.button2);
+		this.button3.setSizeUndefined();
+		this.horizontalLayout.add(this.btnStartRequest, this.button2, this.button3);
 		this.horizontalLayout.setWidthFull();
 		this.horizontalLayout.setHeight(null);
 		this.label.setSizeUndefined();
+		this.anchor.setSizeUndefined();
 		this.button.setSizeUndefined();
-		this.add(this.horizontalLayout, this.label, this.button);
+		this.add(this.horizontalLayout, this.label, this.anchor, this.button);
 		this.setSizeFull();
-
+		
 		this.btnStartRequest.addClickListener(this::btnStartRequest_onClick);
 		this.button2.addClickListener(this::button2_onClick);
+		this.button3.addClickListener(this::button3_onClick);
 		this.button.addClickListener(this::button_onClick);
 	} // </generated-code>
-	
+
 	// <generated-code name="variables">
-	private Button           btnStartRequest, button2, button;
+	private Button           btnStartRequest, button2, button3, button;
+	private Anchor           anchor;
 	private HorizontalLayout horizontalLayout;
 	private Label            label;
 	// </generated-code>
-	
+
 }
